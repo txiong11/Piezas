@@ -1,5 +1,6 @@
 #include "Piezas.h"
 #include <vector>
+#include <iostream>
 /** CLASS Piezas
  * Class for representing a Piezas vertical board, which is roughly based
  * on the game "Connect Four" where pieces are placed in a column and 
@@ -22,6 +23,13 @@
 **/
 Piezas::Piezas()
 {
+    turn = X;
+    for(int i=0; i<BOARD_COLS; i++){
+        std::vector<Piece> p;
+        for(int j=0; j<BOARD_ROWS; j++)
+            p.push_back(Blank);
+        board.push_back(p);
+    }
 }
 
 /**
@@ -30,6 +38,12 @@ Piezas::Piezas()
 **/
 void Piezas::reset()
 {
+    for(int i=0; i<BOARD_COLS; i++){
+        std::vector<Piece> p;
+        for(int j=0; j<BOARD_ROWS; j++)
+            p.push_back(Blank);
+        board.push_back(p);
+    }
 }
 
 /**
@@ -42,6 +56,16 @@ void Piezas::reset()
 **/ 
 Piece Piezas::dropPiece(int column)
 {
+    if(column > 4 || column < 0)
+	  return Invalid;
+    for(int x=0; x<BOARD_ROWS; x++){
+        if(board[column][x] == Blank){
+            board[column][x] = turn;
+            turn = (turn = X) ? O : X;
+            return board[column][x];
+        }
+    }
+    turn = (turn = X) ? O : X; //this colum is full, so can not drop, player lose turn
     return Blank;
 }
 
@@ -51,7 +75,11 @@ Piece Piezas::dropPiece(int column)
 **/
 Piece Piezas::pieceAt(int row, int column)
 {
-    return Blank;
+    if(row >= BOARD_ROWS || column >= BOARD_COLS || row < 0 || column < 0)
+	  return Invalid;
+    if(board[column][row])
+        return board[column][row];
+    else return Blank;
 }
 
 /**
@@ -65,5 +93,58 @@ Piece Piezas::pieceAt(int row, int column)
 **/
 Piece Piezas::gameState()
 {
-    return Blank;
+    //for(int x=0; x<BOARD_ROWS)
+    int X_count=0;
+    int O_count=0;
+    int x_cur=0, o_cur=0;
+
+    for(int i=0; i< BOARD_COLS; i++){
+        //std::vector<Piece> p;
+        for(int j=0; j<board[i].size(); j++){
+            if(board[i][j]==O){
+                o_cur++;
+                if(o_cur > O_count)
+                    O_count = o_cur;
+            }
+            else{
+                o_cur=0;
+            }
+            if(board[i][j]==X){
+                x_cur++;
+                if(x_cur > X_count)
+                    X_count = x_cur;
+            }
+            else{
+                x_cur=0;
+            }
+        }
+    }
+    for(int i=0; i< BOARD_ROWS; i++){
+        //std::vector<Piece> p;
+        for(int j=0; j<board[i].size(); j++){
+            if(board[i][j]==O){
+                o_cur++;
+                if(o_cur > O_count)
+                    O_count = o_cur;
+            }
+            else{
+                o_cur=0;
+            }
+            if(board[i][j]==X){
+                x_cur++;
+                if(x_cur > X_count)
+                    X_count = x_cur;
+            }
+            else{
+                x_cur=0;
+            }
+        }
+    }
+    if(X_count==O_count)
+        return Blank;
+    if(X_count>O_count)
+        return X;
+    if(X_count<O_count)
+        return O;
+
 }
